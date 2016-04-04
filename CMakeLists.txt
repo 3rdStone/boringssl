@@ -119,6 +119,8 @@ elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i686")
   set(ARCH "x86")
 elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
   set(ARCH "arm")
+elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "armv5te")
+  set(ARCH "arm")
 elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "armv6")
   set(ARCH "arm")
 elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "armv7-a")
@@ -153,10 +155,10 @@ endif()
 add_custom_target(all_tests)
 
 add_subdirectory(crypto)
-add_subdirectory(ssl)
-add_subdirectory(ssl/test)
-add_subdirectory(tool)
-add_subdirectory(decrepit)
+#add_subdirectory(ssl)
+#add_subdirectory(ssl/test)
+#add_subdirectory(tool)
+#add_subdirectory(decrepit)
 
 if(FUZZ)
   add_subdirectory(fuzz)
@@ -172,7 +174,7 @@ add_custom_target(
     COMMAND ${GO_EXECUTABLE} run util/all_tests.go -build-dir
             ${CMAKE_BINARY_DIR}
     COMMAND cd ssl/test/runner
-    COMMAND ${GO_EXECUTABLE} test -shim-path $<TARGET_FILE:bssl_shim>
+    #COMMAND ${GO_EXECUTABLE} test -shim-path $<TARGET_FILE:bssl_shim>
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     DEPENDS all_tests bssl_shim
     ${MAYBE_USES_TERMINAL})

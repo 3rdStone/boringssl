@@ -87,9 +87,9 @@ if (${ARCH} STREQUAL "aarch64")
 endif()
 
 # Level 0.1 - depends on nothing outside this set.
+add_subdirectory(err)
 add_subdirectory(stack)
 add_subdirectory(lhash)
-add_subdirectory(err)
 add_subdirectory(buf)
 add_subdirectory(base64)
 add_subdirectory(bytestring)
@@ -117,87 +117,145 @@ add_subdirectory(obj)
 add_subdirectory(asn1)
 
 # Level 2
-add_subdirectory(engine)
-add_subdirectory(dh)
-add_subdirectory(dsa)
-add_subdirectory(rsa)
-add_subdirectory(ec)
-add_subdirectory(ecdh)
-add_subdirectory(ecdsa)
+if(NOT ANDROID)
+  add_subdirectory(engine)
+  add_subdirectory(dh)
+  add_subdirectory(dsa)
+  add_subdirectory(rsa)
+  add_subdirectory(ec)
+  add_subdirectory(ecdh)
+  add_subdirectory(ecdsa)
+endif()
 add_subdirectory(hmac)
 
-# Level 3
-add_subdirectory(cmac)
-add_subdirectory(evp)
-add_subdirectory(hkdf)
-add_subdirectory(pem)
-add_subdirectory(x509)
-add_subdirectory(x509v3)
+if(NOT ANDROID)
+  # Level 3
+  add_subdirectory(cmac)
+  add_subdirectory(evp)
+  add_subdirectory(hkdf)
+  add_subdirectory(pem)
+  add_subdirectory(x509)
+  add_subdirectory(x509v3)
 
-# Level 4
-add_subdirectory(pkcs8)
-
+  # Level 4
+  add_subdirectory(pkcs8)
+endif()
 # Test support code
 add_subdirectory(test)
 
-add_library(
-  crypto
+if(ANDROID)
+  add_library(
+    crypto
 
-  crypto.c
-  directory_posix.c
-  directory_win.c
-  ex_data.c
-  mem.c
-  refcount_c11.c
-  refcount_lock.c
-  thread.c
-  thread_none.c
-  thread_pthread.c
-  thread_win.c
-  time_support.c
+    crypto.c
+    directory_posix.c
+    directory_win.c
+    ex_data.c
+    mem.c
+    refcount_c11.c
+    refcount_lock.c
+    thread.c
+    thread_none.c
+    thread_pthread.c
+    thread_win.c
+    time_support.c
 
-  ${CRYPTO_ARCH_SOURCES}
+    ${CRYPTO_ARCH_SOURCES}
 
-  $<TARGET_OBJECTS:stack>
-  $<TARGET_OBJECTS:lhash>
-  $<TARGET_OBJECTS:err>
-  $<TARGET_OBJECTS:base64>
-  $<TARGET_OBJECTS:bytestring>
-  $<TARGET_OBJECTS:sha>
-  $<TARGET_OBJECTS:md4>
-  $<TARGET_OBJECTS:md5>
-  $<TARGET_OBJECTS:digest>
-  $<TARGET_OBJECTS:cipher>
-  $<TARGET_OBJECTS:modes>
-  $<TARGET_OBJECTS:aes>
-  $<TARGET_OBJECTS:des>
-  $<TARGET_OBJECTS:rc4>
-  $<TARGET_OBJECTS:conf>
-  $<TARGET_OBJECTS:chacha>
-  $<TARGET_OBJECTS:poly1305>
-  $<TARGET_OBJECTS:curve25519>
-  $<TARGET_OBJECTS:buf>
-  $<TARGET_OBJECTS:bn>
-  $<TARGET_OBJECTS:bio>
-  $<TARGET_OBJECTS:rand>
-  $<TARGET_OBJECTS:obj>
-  $<TARGET_OBJECTS:asn1>
-  $<TARGET_OBJECTS:engine>
-  $<TARGET_OBJECTS:dh>
-  $<TARGET_OBJECTS:dsa>
-  $<TARGET_OBJECTS:rsa>
-  $<TARGET_OBJECTS:ec>
-  $<TARGET_OBJECTS:ecdh>
-  $<TARGET_OBJECTS:ecdsa>
-  $<TARGET_OBJECTS:hmac>
-  $<TARGET_OBJECTS:cmac>
-  $<TARGET_OBJECTS:evp>
-  $<TARGET_OBJECTS:hkdf>
-  $<TARGET_OBJECTS:pem>
-  $<TARGET_OBJECTS:x509>
-  $<TARGET_OBJECTS:x509v3>
-  $<TARGET_OBJECTS:pkcs8>
-)
+    # Level 0.1
+    $<TARGET_OBJECTS:err>
+    $<TARGET_OBJECTS:stack>
+    $<TARGET_OBJECTS:lhash>
+    $<TARGET_OBJECTS:buf>
+    $<TARGET_OBJECTS:base64>
+    $<TARGET_OBJECTS:bytestring>
+
+    # Level 0.2 - depends on nothing but itself
+    $<TARGET_OBJECTS:sha>
+    $<TARGET_OBJECTS:md4>
+    $<TARGET_OBJECTS:md5>
+    $<TARGET_OBJECTS:modes>
+    $<TARGET_OBJECTS:aes>
+    $<TARGET_OBJECTS:des>
+    $<TARGET_OBJECTS:rc4>
+    $<TARGET_OBJECTS:conf>
+    $<TARGET_OBJECTS:chacha>
+    $<TARGET_OBJECTS:poly1305>
+    $<TARGET_OBJECTS:curve25519>
+
+    # Level 1, depends only on 0.*
+    $<TARGET_OBJECTS:digest>
+    $<TARGET_OBJECTS:cipher>
+    $<TARGET_OBJECTS:rand>
+    $<TARGET_OBJECTS:bio>
+    $<TARGET_OBJECTS:bn>
+    $<TARGET_OBJECTS:obj>
+    $<TARGET_OBJECTS:asn1>
+
+    # Level 2
+    $<TARGET_OBJECTS:hmac>
+  )
+else ()
+  add_library(
+    crypto
+
+    crypto.c
+    directory_posix.c
+    directory_win.c
+    ex_data.c
+    mem.c
+    refcount_c11.c
+    refcount_lock.c
+    thread.c
+    thread_none.c
+    thread_pthread.c
+    thread_win.c
+    time_support.c
+
+    ${CRYPTO_ARCH_SOURCES}
+
+    $<TARGET_OBJECTS:err>
+    $<TARGET_OBJECTS:sha>
+    $<TARGET_OBJECTS:digest>
+    $<TARGET_OBJECTS:hmac>
+    $<TARGET_OBJECTS:md4>
+    $<TARGET_OBJECTS:md5>
+
+    $<TARGET_OBJECTS:stack>
+    $<TARGET_OBJECTS:lhash>
+    $<TARGET_OBJECTS:base64>
+    $<TARGET_OBJECTS:bytestring>
+    $<TARGET_OBJECTS:cipher>
+    $<TARGET_OBJECTS:modes>
+    $<TARGET_OBJECTS:aes>
+    $<TARGET_OBJECTS:des>
+    $<TARGET_OBJECTS:rc4>
+    $<TARGET_OBJECTS:conf>
+    $<TARGET_OBJECTS:chacha>
+    $<TARGET_OBJECTS:poly1305>
+    $<TARGET_OBJECTS:curve25519>
+    $<TARGET_OBJECTS:buf>
+    $<TARGET_OBJECTS:bn>
+    $<TARGET_OBJECTS:bio>
+    $<TARGET_OBJECTS:rand>
+    $<TARGET_OBJECTS:obj>
+    $<TARGET_OBJECTS:asn1>
+    $<TARGET_OBJECTS:engine>
+    $<TARGET_OBJECTS:dh>
+    $<TARGET_OBJECTS:dsa>
+    $<TARGET_OBJECTS:rsa>
+    $<TARGET_OBJECTS:ec>
+    $<TARGET_OBJECTS:ecdh>
+    $<TARGET_OBJECTS:ecdsa>
+    $<TARGET_OBJECTS:cmac>
+    $<TARGET_OBJECTS:evp>
+    $<TARGET_OBJECTS:hkdf>
+    $<TARGET_OBJECTS:pem>
+    $<TARGET_OBJECTS:x509>
+    $<TARGET_OBJECTS:x509v3>
+    $<TARGET_OBJECTS:pkcs8>
+  )
+endif()
 
 if(NOT MSVC AND NOT ANDROID)
   target_link_libraries(crypto pthread)
